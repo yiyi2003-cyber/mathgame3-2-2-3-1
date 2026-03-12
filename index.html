@@ -139,7 +139,6 @@
             return "";
         }
 
-        // 當點擊「計算答案」按鈕時觸發
         function triggerUpdateAnswer(type, index) {
             const pool = type === 'conversion' ? conversionPool : comparisonPool;
             const questionText = pool[index].q;
@@ -153,7 +152,6 @@
         function handleQuestionTextChange(type, index, value) {
             const pool = type === 'conversion' ? conversionPool : comparisonPool;
             pool[index].q = value;
-            // 這裡不自動更新 pool[index].a，等待用戶按按鈕
         }
 
         function render() {
@@ -235,13 +233,22 @@
                             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 leading-relaxed">${q.q}</h2>
                         </div>
                         <div class="mb-10">
-                            <input type="text" id="answerInput" autofocus class="w-full p-6 bg-white border-4 border-gray-50 rounded-3xl text-3xl text-center focus:border-green-400 outline-none transition-all shadow-sm" placeholder="輸入答案">
+                            <input type="text" id="answerInput" class="w-full p-6 bg-white border-4 border-gray-50 rounded-3xl text-3xl text-center focus:border-green-400 outline-none transition-all shadow-sm" placeholder="輸入答案" autocomplete="off">
                         </div>
                         <button onclick="submitAnswer()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl font-bold btn-hover">確定送出</button>
                     </div>
                 `;
-                setTimeout(() => document.getElementById('answerInput').focus(), 10);
-                document.getElementById('answerInput').onkeypress = (e) => e.key === 'Enter' && submitAnswer();
+                
+                // 延遲一點點時間再獲取焦點，確保元素已完全加載到 DOM
+                setTimeout(() => {
+                    const input = document.getElementById('answerInput');
+                    if(input) {
+                        input.focus();
+                        input.onkeydown = (e) => {
+                            if (e.key === 'Enter') submitAnswer();
+                        };
+                    }
+                }, 100);
             } else if (currentState === 'result') {
                 container.style.maxWidth = "42rem";
                 container.innerHTML = `
@@ -283,6 +290,8 @@
             const input = document.getElementById('answerInput');
             if (!input) return;
             const userVal = input.value.trim().replace(/\s+/g, '');
+            if (userVal === "") return; // 防止空值提交
+
             const correctVal = currentGameQuestions[currentStepIndex].a.trim().replace(/\s+/g, '');
             const isCorrect = (userVal === correctVal);
             if (isCorrect) score++;
