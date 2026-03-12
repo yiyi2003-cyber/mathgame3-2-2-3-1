@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>容量的換算與比較 - 循環練習版</title>
+    <title>容量的換算與比較 - 題庫輪替版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -60,7 +60,6 @@
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        /* 確保遊戲輸入框文字清晰 */
         #answerInput {
             -webkit-text-fill-color: #1f2937;
             color: #1f2937;
@@ -76,73 +75,72 @@
 
     <script>
         /**
-         * 題庫數據管理 - 已填入剛才生成的數值作為固定預設
+         * 題庫數據管理
          */
         let conversionPool = [
-            { q: "2 公升 50 毫升 = ( ) 毫升", a: "2050" },
-            { q: "2 公升 60 毫升 = ( ) 毫升", a: "2060" },
-            { q: "3020 毫升 = ( ) 公升 ( ) 毫升", a: "3,20" },
-            { q: "3030 毫升 = ( ) 公升 ( ) 毫升", a: "3,30" },
-            { q: "3040 毫升 = ( ) 公升 ( ) 毫升", a: "3,40" },
-            { q: "2 公升 100 毫升 = ( ) 毫升", a: "2100" },
-            { q: "2 公升 110 毫升 = ( ) 毫升", a: "2110" },
-            { q: "3070 毫升 = ( ) 公升 ( ) 毫升", a: "3,70" },
-            { q: "3080 毫升 = ( ) 公升 ( ) 毫升", a: "3,80" },
-            { q: "3090 毫升 = ( ) 公升 ( ) 毫升", a: "3,90" },
-            { q: "2 公升 150 毫升 = ( ) 毫升", a: "2150" },
-            { q: "2 公升 160 毫升 = ( ) 毫升", a: "2160" },
-            { q: "3120 毫升 = ( ) 公升 ( ) 毫升", a: "3,120" },
-            { q: "3130 毫升 = ( ) 公升 ( ) 毫升", a: "3,130" },
-            { q: "3140 毫升 = ( ) 公升 ( ) 毫升", a: "3,140" },
-            { q: "2 公升 200 毫升 = ( ) 毫升", a: "2200" },
-            { q: "2 公升 210 毫升 = ( ) 毫升", a: "2210" },
-            { q: "3170 毫升 = ( ) 公升 ( ) 毫升", a: "3,170" },
-            { q: "3180 毫升 = ( ) 公升 ( ) 毫升", a: "3,180" },
-            { q: "3190 毫升 = ( ) 公升 ( ) 毫升", a: "3,190" },
-            { q: "2 公升 250 毫升 = ( ) 毫升", a: "2250" },
-            { q: "2 公升 260 毫升 = ( ) 毫升", a: "2260" },
-            { q: "3220 毫升 = ( ) 公升 ( ) 毫升", a: "3,220" },
-            { q: "3230 毫升 = ( ) 公升 ( ) 毫升", a: "3,230" },
-            { q: "3240 毫升 = ( ) 公升 ( ) 毫升", a: "3,240" }
+            { q: "1 公升 250 毫升 = ( ) 毫升", a: "1250" },
+            { q: "4 公升 80 毫升 = ( ) 毫升", a: "4080" },
+            { q: "2070 毫升 = ( ) 公升 ( ) 毫升", a: "2,70" },
+            { q: "5300 毫升 = ( ) 公升 ( ) 毫升", a: "5,300" },
+            { q: "3005 毫升 = ( ) 公升 ( ) 毫升", a: "3,5" },
+            { q: "6 公升 120 毫升 = ( ) 毫升", a: "6120" },
+            { q: "8 公升 9 毫升 = ( ) 毫升", a: "8009" },
+            { q: "7045 毫升 = ( ) 公升 ( ) 毫升", a: "7,45" },
+            { q: "9210 毫升 = ( ) 公升 ( ) 毫升", a: "9,210" },
+            { q: "1060 毫升 = ( ) 公升 ( ) 毫升", a: "1,60" },
+            { q: "2 公升 400 毫升 = ( ) 毫升", a: "2400" },
+            { q: "5 公升 15 毫升 = ( ) 毫升", a: "5015" },
+            { q: "4180 毫升 = ( ) 公升 ( ) 毫升", a: "4,180" },
+            { q: "8002 毫升 = ( ) 公升 ( ) 毫升", a: "8,2" },
+            { q: "3600 毫升 = ( ) 公升 ( ) 毫升", a: "3,600" },
+            { q: "7 公升 88 毫升 = ( ) 毫升", a: "7088" },
+            { q: "9 公升 500 毫升 = ( ) 毫升", a: "9500" },
+            { q: "1340 毫升 = ( ) 公升 ( ) 毫升", a: "1,340" },
+            { q: "6077 毫升 = ( ) 公升 ( ) 毫升", a: "6,77" },
+            { q: "2222 毫升 = ( ) 公升 ( ) 毫升", a: "2,222" },
+            { q: "4 公升 9 毫升 = ( ) 毫升", a: "4009" },
+            { q: "8 公升 720 毫升 = ( ) 毫升", a: "8720" },
+            { q: "5050 毫升 = ( ) 公升 ( ) 毫升", a: "5,50" },
+            { q: "3100 毫升 = ( ) 公升 ( ) 毫升", a: "3,100" },
+            { q: "7900 毫升 = ( ) 公升 ( ) 毫升", a: "7,900" }
         ];
 
         let comparisonPool = [
-            { q: "1000 毫升 ( ) 1200 毫升", a: "<" },
-            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
-            { q: "2010 毫升 ( ) 2 公升 10 毫升", a: "=" },
-            { q: "2015 毫升 ( ) 2 公升 15 毫升", a: "=" },
-            { q: "2020 毫升 ( ) 2 公升 20 毫升", a: "=" },
-            { q: "1050 毫升 ( ) 1205 毫升", a: "<" },
-            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
-            { q: "2030 毫升 ( ) 2 公升 30 毫升", a: "=" },
-            { q: "2035 毫升 ( ) 2 公升 35 毫升", a: "=" },
-            { q: "2040 毫升 ( ) 2 公升 40 毫升", a: "=" },
-            { q: "1100 毫升 ( ) 1210 毫升", a: "<" },
-            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
-            { q: "2050 毫升 ( ) 2 公升 50 毫升", a: "=" },
-            { q: "2055 毫升 ( ) 2 公升 55 毫升", a: "=" },
-            { q: "2060 毫升 ( ) 2 公升 60 毫升", a: "=" },
-            { q: "1150 毫升 ( ) 1215 毫升", a: "<" },
-            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
-            { q: "2070 毫升 ( ) 2 公升 70 毫升", a: "=" },
-            { q: "2075 毫升 ( ) 2 公升 75 毫升", a: "=" },
-            { q: "2080 毫升 ( ) 2 公升 80 毫升", a: "=" },
-            { q: "1200 毫升 ( ) 1220 毫升", a: "<" },
-            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
-            { q: "2100 毫升 ( ) 2 公升 100 毫升", a: "=" },
-            { q: "2105 毫升 ( ) 2 公升 105 毫升", a: "=" },
-            { q: "2110 毫升 ( ) 2 公升 110 毫升", a: "=" }
+            { q: "2300 毫升 ( ) 2 公升 30 毫升", a: ">" },
+            { q: "5 公升 100 毫升 ( ) 5100 毫升", a: "=" },
+            { q: "1090 毫升 ( ) 1 公升 9 毫升", a: ">" },
+            { q: "4 公升 ( ) 3999 毫升", a: ">" },
+            { q: "6006 毫升 ( ) 6 公升 60 毫升", a: "<" },
+            { q: "3 公升 450 毫升 ( ) 3450 毫升", a: "=" },
+            { q: "8200 毫升 ( ) 8 公升 20 毫升", a: ">" },
+            { q: "7 公升 5 毫升 ( ) 7050 毫升", a: "<" },
+            { q: "9111 毫升 ( ) 9 公升 111 毫升", a: "=" },
+            { q: "1 公升 800 毫升 ( ) 1080 毫升", a: ">" },
+            { q: "2002 毫升 ( ) 2 公升 2 毫升", a: "=" },
+            { q: "5500 毫升 ( ) 5 公升 55 毫升", a: ">" },
+            { q: "4 公升 10 毫升 ( ) 4100 毫升", a: "<" },
+            { q: "3030 毫升 ( ) 3 公升 300 毫升", a: "<" },
+            { q: "6 公升 2 毫升 ( ) 6002 毫升", a: "=" },
+            { q: "8880 毫升 ( ) 8 公升 88 毫升", a: ">" },
+            { q: "7 公升 70 毫升 ( ) 7700 毫升", a: "<" },
+            { q: "9009 毫升 ( ) 9 公升 9 毫升", a: "=" },
+            { q: "1250 毫升 ( ) 1 公升 25 毫升", a: ">" },
+            { q: "4 公升 4 毫升 ( ) 4040 毫升", a: "<" },
+            { q: "2 公升 90 毫升 ( ) 2090 毫升", a: "=" },
+            { q: "5001 毫升 ( ) 5 公升", a: ">" },
+            { q: "3 公升 150 毫升 ( ) 3150 毫升", a: "=" },
+            { q: "8070 毫升 ( ) 8 公升 700 毫升", a: "<" },
+            { q: "6990 毫升 ( ) 7 公升", a: "<" }
         ];
 
         let currentState = 'start'; 
-        let currentIndex = 0; 
         let currentGameQuestions = []; 
         let currentStepIndex = 0; 
         let score = 0;
         let userAnswers = [];
         let feedbackState = null; 
+        let currentBatchIndex = 0; // 追蹤目前是第幾組 (0~4)
 
-        // 自動計算邏輯
         function autoCalculateAnswer(text, type) {
             try {
                 const cleanText = text.replace(/\s+/g, '');
@@ -187,7 +185,6 @@
             return "";
         }
 
-        // 局部更新編輯器內的答案數值，防止頁面跳動
         function triggerUpdateAnswer(type, index) {
             const pool = type === 'conversion' ? conversionPool : comparisonPool;
             const questionText = pool[index].q;
@@ -227,51 +224,54 @@
                             </svg>
                         </div>
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">容量換算與比較</h1>
-                        <p class="text-gray-500 mb-8 px-4 text-sm">目前選定：第 ${currentIndex + 1} ~ ${currentIndex + 5} 題組 (總計 25 題循環)</p>
+                        <p class="text-gray-500 mb-8 px-4 text-sm font-medium">固定題庫練習 (共有 5 組 50 題)</p>
                         
                         <div class="space-y-4 w-full max-w-sm">
-                            <button onclick="startGame()" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl text-xl font-bold btn-hover shadow-lg">開始遊戲</button>
+                            <button onclick="startGame(0)" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl text-xl font-bold btn-hover shadow-lg">開始遊戲</button>
                             <button onclick="goSettings()" class="w-full border-2 border-green-100 text-green-600 py-3 rounded-2xl font-medium btn-hover flex items-center justify-center hover:bg-green-50">
-                                進入題庫編輯器 (修改我的題目)
+                                進入題庫編輯器
                             </button>
                         </div>
                     </div>
                 `;
             } else if (currentState === 'settings') {
                 container.style.maxWidth = "64rem"; 
-                const genInputs = (pool, type) => pool.map((q, i) => `
-                    <div class="mb-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-green-200 transition-colors">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">題目 #${i+1}</span>
-                            ${(i >= currentIndex && i < currentIndex + 5) ? '<span class="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">目前考題範圍</span>' : ''}
+                const genInputs = (pool, type) => pool.map((q, i) => {
+                    const isCurrentBatch = (i >= currentBatchIndex * 5 && i < (currentBatchIndex + 1) * 5);
+                    return `
+                        <div class="mb-4 p-4 bg-white rounded-2xl border ${isCurrentBatch ? 'border-green-400 ring-2 ring-green-100' : 'border-gray-100'} shadow-sm hover:border-green-200 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">題目 #${i+1}</span>
+                                ${isCurrentBatch ? '<span class="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">下一輪出題範圍</span>' : ''}
+                            </div>
+                            <div class="flex gap-2 mb-2">
+                                <input type="text" value="${q.q}" oninput="handleQuestionTextChange('${type}', ${i}, this.value)" class="flex-grow p-2 text-sm bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-green-400 outline-none font-medium" placeholder="輸入題目內容">
+                                <button onclick="triggerUpdateAnswer('${type}', ${i})" class="calc-btn px-3 py-1 bg-green-700 text-white text-[10px] font-bold rounded-lg shadow-sm hover:bg-green-800 whitespace-nowrap">計算答案</button>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-[10px] text-green-500 font-bold mr-2">正解:</span>
+                                <input type="text" id="ans-input-${type}-${i}" value="${q.a}" onchange="updatePool('${type}', ${i}, 'a', this.value)" class="flex-grow p-2 text-sm bg-green-50 border-none rounded-lg text-green-700 font-bold focus:ring-2 focus:ring-green-400 outline-none transition-all duration-300">
+                            </div>
                         </div>
-                        <div class="flex gap-2 mb-2">
-                            <input type="text" value="${q.q}" oninput="handleQuestionTextChange('${type}', ${i}, this.value)" class="flex-grow p-2 text-sm bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-green-400 outline-none font-medium" placeholder="輸入題目內容">
-                            <button onclick="triggerUpdateAnswer('${type}', ${i})" class="calc-btn px-3 py-1 bg-green-700 text-white text-[10px] font-bold rounded-lg shadow-sm hover:bg-green-800 whitespace-nowrap">計算答案</button>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="text-[10px] text-green-500 font-bold mr-2">正解:</span>
-                            <input type="text" id="ans-input-${type}-${i}" value="${q.a}" onchange="updatePool('${type}', ${i}, 'a', this.value)" class="flex-grow p-2 text-sm bg-green-50 border-none rounded-lg text-green-700 font-bold focus:ring-2 focus:ring-green-400 outline-none transition-all duration-300">
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
                 container.innerHTML = `
                     <div class="flex flex-col h-full overflow-hidden">
                         <div class="flex justify-between items-center mb-6 flex-shrink-0">
                             <div>
                                 <h2 class="text-2xl font-bold text-gray-800">題庫編輯器</h2>
-                                <p class="text-xs text-gray-400 mt-1">在這裡修改成你想要的題目，程式會記住你的修改。離開編輯器時會自動儲存。</p>
+                                <p class="text-xs text-gray-400 mt-1">手動修改題目內容。框出的範圍是下一輪會出現的題目。</p>
                             </div>
                             <button onclick="goHome()" class="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold btn-hover">儲存並返回</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow min-h-0">
                             <div class="flex flex-col bg-blue-50/30 p-5 rounded-3xl border border-blue-100 overflow-hidden">
-                                <h3 class="font-bold text-blue-700 mb-4 flex items-center px-1">容量換算 (1-25)</h3>
+                                <h3 class="font-bold text-blue-700 mb-4 flex items-center px-1">容量換算池 (共25題)</h3>
                                 <div class="scroll-area custom-scrollbar pr-1">${genInputs(conversionPool, 'conversion')}</div>
                             </div>
                             <div class="flex flex-col bg-orange-50/30 p-5 rounded-3xl border border-orange-100 overflow-hidden">
-                                <h3 class="font-bold text-orange-700 mb-4 flex items-center px-1">容量比較 (1-25)</h3>
+                                <h3 class="font-bold text-orange-700 mb-4 flex items-center px-1">容量比較池 (共25題)</h3>
                                 <div class="scroll-area custom-scrollbar pr-1">${genInputs(comparisonPool, 'comparison')}</div>
                             </div>
                         </div>
@@ -306,9 +306,12 @@
                 container.innerHTML = `
                     <div class="flex flex-col flex-grow justify-center">
                         <div class="flex justify-between items-center mb-8">
-                            <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${isComparison ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}">
-                                ${isComparison ? '容量比較' : '容量換算'}
-                            </span>
+                            <div class="flex flex-col">
+                                <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${isComparison ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}">
+                                    ${isComparison ? '容量比較' : '容量換算'}
+                                </span>
+                                <span class="text-[10px] text-gray-400 mt-1 font-bold">第 ${currentBatchIndex + 1} 組題目</span>
+                            </div>
                             <div class="text-right"><span class="text-3xl font-black text-gray-800">${currentStepIndex + 1}</span><span class="text-gray-300 font-bold text-xl">/ 10</span></div>
                         </div>
                         <div class="text-center py-16 px-8 bg-gray-50 rounded-[2.5rem] mb-10 border-b-8 border-gray-100 shadow-inner">
@@ -318,8 +321,7 @@
                             <input type="text" id="answerInput" 
                                 class="w-full p-6 bg-white border-4 border-gray-100 rounded-3xl text-4xl text-center focus:border-green-400 outline-none transition-all shadow-sm" 
                                 placeholder="在此輸入答案" 
-                                autocomplete="off"
-                                style="color: #1f2937 !important; -webkit-text-fill-color: #1f2937 !important;">
+                                autocomplete="off">
                         </div>
                         <button onclick="submitAnswer()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl font-bold btn-hover shadow-lg">確定送出</button>
                     </div>
@@ -339,17 +341,20 @@
                 container.innerHTML = `
                     <div class="text-center py-6 flex flex-col flex-grow justify-center">
                         <div class="text-7xl mb-6">🎯</div>
-                        <h2 class="text-2xl font-bold text-gray-800">練習完成！</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">練習完成！(第 ${currentBatchIndex + 1} 組)</h2>
                         <div class="text-8xl font-black text-green-600 mb-8">${score * 10}</div>
-                        <div class="text-left bg-gray-50 p-6 rounded-[2rem] mb-10 max-h-64 overflow-y-auto custom-scrollbar border border-gray-100">
+                        <div class="text-left bg-gray-50 p-6 rounded-[2rem] mb-8 max-h-60 overflow-y-auto custom-scrollbar border border-gray-100">
                             ${userAnswers.map((ua, i) => `
-                                <div class="flex justify-between items-center py-4 border-b border-gray-200 last:border-0">
+                                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
                                     <span class="text-sm text-gray-700 font-medium">${currentGameQuestions[i].q}</span>
                                     <span class="text-sm font-bold ${ua.isCorrect ? 'text-green-600' : 'text-red-500'}">${ua.isCorrect ? '答對' : '正解：' + currentGameQuestions[i].a}</span>
                                 </div>
                             `).join('')}
                         </div>
-                        <button onclick="goHome()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl font-bold btn-hover">回主選單</button>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="playNextBatch()" class="bg-green-600 text-white py-4 rounded-3xl text-lg font-bold btn-hover shadow-lg">再玩一次 (下組)</button>
+                            <button onclick="goHome()" class="bg-gray-200 text-gray-700 py-4 rounded-3xl text-lg font-bold btn-hover">回主選單</button>
+                        </div>
                     </div>
                 `;
             }
@@ -358,14 +363,28 @@
         function goHome() { currentState = 'start'; feedbackState = null; render(); }
         function goSettings() { currentState = 'settings'; feedbackState = null; render(); }
 
-        function startGame() {
-            // 從池子中抓取當前組別的 5+5 題
+        /**
+         * 啟動指定組別的遊戲
+         */
+        function startGame(batchIdx) {
+            currentBatchIndex = batchIdx;
+            const startIdx = currentBatchIndex * 5;
             currentGameQuestions = [
-                ...conversionPool.slice(currentIndex, currentIndex + 5),
-                ...comparisonPool.slice(currentIndex, currentIndex + 5)
+                ...conversionPool.slice(startIdx, startIdx + 5),
+                ...comparisonPool.slice(startIdx, startIdx + 5)
             ];
             currentState = 'game';
             currentStepIndex = 0; score = 0; userAnswers = []; feedbackState = null; render();
+        }
+
+        /**
+         * 自動輪替到下一組題庫
+         */
+        function playNextBatch() {
+            // 輪替邏輯：0 -> 1 -> 2 -> 3 -> 4 -> 0
+            let nextIdx = currentBatchIndex + 1;
+            if (nextIdx >= 5) nextIdx = 0; 
+            startGame(nextIdx);
         }
 
         function submitAnswer() {
@@ -393,8 +412,6 @@
                 currentStepIndex++;
                 render();
             } else {
-                // 自動跳到下 5 題組循環
-                currentIndex = (currentIndex + 5) % 25;
                 currentState = 'result';
                 render();
             }
