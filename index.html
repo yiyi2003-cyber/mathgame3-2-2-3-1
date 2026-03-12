@@ -52,6 +52,14 @@
             background-color: #166534;
             transform: translateY(1px);
         }
+        /* 回饋動畫 */
+        .feedback-pop {
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-6">
@@ -65,7 +73,7 @@
         let conversionPool = [];
         let comparisonPool = [];
 
-        // 初始化預設題目 (僅執行一次)
+        // 初始化預設題目
         function initDefaultPool() {
             for (let i = 0; i < 25; i++) {
                 let cyclePos = i % 5;
@@ -93,6 +101,7 @@
         let currentStepIndex = 0; 
         let score = 0;
         let userAnswers = [];
+        let feedbackState = null; // 用於存放當前回饋資訊
 
         // 智慧自動計算答案邏輯
         function autoCalculateAnswer(text, type) {
@@ -186,7 +195,7 @@
                             ${(i >= currentIndex && i < currentIndex + 5) ? '<span class="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">目前考題</span>' : ''}
                         </div>
                         <div class="flex gap-2 mb-2">
-                            <input type="text" value="${q.q}" oninput="handleQuestionTextChange('${type}', ${i}, this.value)" class="flex-grow p-2 text-sm bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-green-400 outline-none font-medium" placeholder="輸入題目內容">
+                            <input type="text" value="${q.q}" oninput="handleQuestionTextChange('${type}', ${i}, this.value)" class="flex-grow p-2 text-sm bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-green-400 outline-none font-medium" placeholder="輸入題目內容">
                             <button onclick="triggerUpdateAnswer('${type}', ${i})" class="calc-btn px-3 py-1 bg-green-700 text-white text-[10px] font-bold rounded-lg shadow-sm hover:bg-green-800 whitespace-nowrap">計算答案</button>
                         </div>
                         <div class="flex items-center">
@@ -201,7 +210,7 @@
                         <div class="flex justify-between items-center mb-6 flex-shrink-0">
                             <div>
                                 <h2 class="text-2xl font-bold text-gray-800">題庫編輯器</h2>
-                                <p class="text-xs text-gray-400 mt-1">改好題目後，請點擊「計算答案」按鈕來更新正確答案</p>
+                                <p class="text-xs text-gray-400 mt-1">改好題目後，點擊「計算答案」同步更新正解</p>
                             </div>
                             <button onclick="goHome()" class="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold btn-hover">儲存並返回</button>
                         </div>
@@ -221,6 +230,29 @@
                 container.style.maxWidth = "42rem";
                 const q = currentGameQuestions[currentStepIndex];
                 const isComparison = currentStepIndex >= 5;
+                
+                // 如果正在顯示回饋，則渲染回饋畫面
+                if (feedbackState) {
+                    container.innerHTML = `
+                        <div class="flex flex-col flex-grow justify-center items-center feedback-pop">
+                            <div class="mb-6 p-8 rounded-full ${feedbackState.isCorrect ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    ${feedbackState.isCorrect ? 
+                                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />' : 
+                                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />'}
+                                </svg>
+                            </div>
+                            <h2 class="text-4xl font-black mb-2 ${feedbackState.isCorrect ? 'text-green-600' : 'text-red-600'}">
+                                ${feedbackState.isCorrect ? '太棒了！答對囉' : '不小心答錯囉'}
+                            </h2>
+                            ${!feedbackState.isCorrect ? `<p class="text-xl text-gray-500 mb-8 font-bold">正確答案是：<span class="text-red-600">${feedbackState.correctAnswer}</span></p>` : '<div class="mb-8"></div>'}
+                            
+                            <button onclick="nextStep()" class="w-full max-w-sm bg-gray-800 text-white py-5 rounded-3xl text-xl font-bold btn-hover shadow-xl">繼續下一題</button>
+                        </div>
+                    `;
+                    return;
+                }
+
                 container.innerHTML = `
                     <div class="flex flex-col flex-grow justify-center">
                         <div class="flex justify-between items-center mb-8">
@@ -233,13 +265,12 @@
                             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 leading-relaxed">${q.q}</h2>
                         </div>
                         <div class="mb-10">
-                            <input type="text" id="answerInput" class="w-full p-6 bg-white border-4 border-gray-50 rounded-3xl text-3xl text-center focus:border-green-400 outline-none transition-all shadow-sm" placeholder="輸入答案" autocomplete="off">
+                            <input type="text" id="answerInput" class="w-full p-6 bg-white border-4 border-gray-100 rounded-3xl text-3xl text-center focus:border-green-400 text-gray-800 outline-none transition-all shadow-sm" placeholder="在此輸入答案" autocomplete="off" style="color: #1f2937 !important;">
                         </div>
-                        <button onclick="submitAnswer()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl font-bold btn-hover">確定送出</button>
+                        <button onclick="submitAnswer()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl font-bold btn-hover shadow-lg">確定送出</button>
                     </div>
                 `;
                 
-                // 延遲一點點時間再獲取焦點，確保元素已完全加載到 DOM
                 setTimeout(() => {
                     const input = document.getElementById('answerInput');
                     if(input) {
@@ -248,7 +279,7 @@
                             if (e.key === 'Enter') submitAnswer();
                         };
                     }
-                }, 100);
+                }, 150);
             } else if (currentState === 'result') {
                 container.style.maxWidth = "42rem";
                 container.innerHTML = `
@@ -259,7 +290,7 @@
                         <div class="text-left bg-gray-50 p-6 rounded-[2rem] mb-10 max-h-64 overflow-y-auto custom-scrollbar border border-gray-100">
                             ${userAnswers.map((ua, i) => `
                                 <div class="flex justify-between items-center py-4 border-b border-gray-200 last:border-0">
-                                    <span class="text-sm text-gray-700">${currentGameQuestions[i].q}</span>
+                                    <span class="text-sm text-gray-700 font-medium">${currentGameQuestions[i].q}</span>
                                     <span class="text-sm font-bold ${ua.isCorrect ? 'text-green-600' : 'text-red-500'}">${ua.isCorrect ? '答對' : '正解：' + currentGameQuestions[i].a}</span>
                                 </div>
                             `).join('')}
@@ -270,8 +301,8 @@
             }
         }
 
-        function goHome() { currentState = 'start'; render(); }
-        function goSettings() { currentState = 'settings'; render(); }
+        function goHome() { currentState = 'start'; feedbackState = null; render(); }
+        function goSettings() { currentState = 'settings'; feedbackState = null; render(); }
         function updatePool(type, index, field, value) {
             const pool = type === 'conversion' ? conversionPool : comparisonPool;
             pool[index][field] = value;
@@ -283,20 +314,31 @@
                 ...comparisonPool.slice(currentIndex, currentIndex + 5)
             ];
             currentState = 'game';
-            currentStepIndex = 0; score = 0; userAnswers = []; render();
+            currentStepIndex = 0; score = 0; userAnswers = []; feedbackState = null; render();
         }
 
         function submitAnswer() {
             const input = document.getElementById('answerInput');
             if (!input) return;
             const userVal = input.value.trim().replace(/\s+/g, '');
-            if (userVal === "") return; // 防止空值提交
+            if (userVal === "") return;
 
             const correctVal = currentGameQuestions[currentStepIndex].a.trim().replace(/\s+/g, '');
             const isCorrect = (userVal === correctVal);
             if (isCorrect) score++;
+            
             userAnswers.push({ userVal, isCorrect });
 
+            // 進入回饋狀態
+            feedbackState = {
+                isCorrect: isCorrect,
+                correctAnswer: correctVal
+            };
+            render();
+        }
+
+        function nextStep() {
+            feedbackState = null;
             if (currentStepIndex < 9) {
                 currentStepIndex++;
                 render();
