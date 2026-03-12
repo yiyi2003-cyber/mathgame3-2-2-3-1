@@ -60,6 +60,12 @@
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        /* 確保遊戲輸入框文字清晰 */
+        #answerInput {
+            -webkit-text-fill-color: #1f2937;
+            color: #1f2937;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="p-4 md:p-6">
@@ -69,31 +75,64 @@
     </div>
 
     <script>
-        // 核心題庫數據 (25題換算 + 25題比較)
-        let conversionPool = [];
-        let comparisonPool = [];
+        /**
+         * 題庫數據管理 - 已填入剛才生成的數值作為固定預設
+         */
+        let conversionPool = [
+            { q: "2 公升 50 毫升 = ( ) 毫升", a: "2050" },
+            { q: "2 公升 60 毫升 = ( ) 毫升", a: "2060" },
+            { q: "3020 毫升 = ( ) 公升 ( ) 毫升", a: "3,20" },
+            { q: "3030 毫升 = ( ) 公升 ( ) 毫升", a: "3,30" },
+            { q: "3040 毫升 = ( ) 公升 ( ) 毫升", a: "3,40" },
+            { q: "2 公升 100 毫升 = ( ) 毫升", a: "2100" },
+            { q: "2 公升 110 毫升 = ( ) 毫升", a: "2110" },
+            { q: "3070 毫升 = ( ) 公升 ( ) 毫升", a: "3,70" },
+            { q: "3080 毫升 = ( ) 公升 ( ) 毫升", a: "3,80" },
+            { q: "3090 毫升 = ( ) 公升 ( ) 毫升", a: "3,90" },
+            { q: "2 公升 150 毫升 = ( ) 毫升", a: "2150" },
+            { q: "2 公升 160 毫升 = ( ) 毫升", a: "2160" },
+            { q: "3120 毫升 = ( ) 公升 ( ) 毫升", a: "3,120" },
+            { q: "3130 毫升 = ( ) 公升 ( ) 毫升", a: "3,130" },
+            { q: "3140 毫升 = ( ) 公升 ( ) 毫升", a: "3,140" },
+            { q: "2 公升 200 毫升 = ( ) 毫升", a: "2200" },
+            { q: "2 公升 210 毫升 = ( ) 毫升", a: "2210" },
+            { q: "3170 毫升 = ( ) 公升 ( ) 毫升", a: "3,170" },
+            { q: "3180 毫升 = ( ) 公升 ( ) 毫升", a: "3,180" },
+            { q: "3190 毫升 = ( ) 公升 ( ) 毫升", a: "3,190" },
+            { q: "2 公升 250 毫升 = ( ) 毫升", a: "2250" },
+            { q: "2 公升 260 毫升 = ( ) 毫升", a: "2260" },
+            { q: "3220 毫升 = ( ) 公升 ( ) 毫升", a: "3,220" },
+            { q: "3230 毫升 = ( ) 公升 ( ) 毫升", a: "3,230" },
+            { q: "3240 毫升 = ( ) 公升 ( ) 毫升", a: "3,240" }
+        ];
 
-        // 初始化預設題目
-        function initDefaultPool() {
-            for (let i = 0; i < 25; i++) {
-                let cyclePos = i % 5;
-                if (cyclePos < 2) {
-                    let l = 2, ml = 50 + i * 10;
-                    conversionPool.push({ q: `${l} 公升 ${ml} 毫升 = ( ) 毫升`, a: (l * 1000 + ml).toString() });
-                } else {
-                    let totalMl = 3000 + i * 10;
-                    conversionPool.push({ q: `${totalMl} 毫升 = ( ) 公升 ( ) 毫升`, a: `${Math.floor(totalMl/1000)},${totalMl%1000}` });
-                }
-                if (cyclePos === 0) {
-                    comparisonPool.push({ q: `${1000+i*10} 毫升 ( ) ${1200+i} 毫升`, a: "<" });
-                } else if (cyclePos === 1) {
-                    comparisonPool.push({ q: `1公升200毫升 ( ) 1公升100毫升`, a: ">" });
-                } else {
-                    comparisonPool.push({ q: `${2000+i*5} 毫升 ( ) 2 公升 ${i*5} 毫升`, a: "=" });
-                }
-            }
-        }
-        initDefaultPool();
+        let comparisonPool = [
+            { q: "1000 毫升 ( ) 1200 毫升", a: "<" },
+            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
+            { q: "2010 毫升 ( ) 2 公升 10 毫升", a: "=" },
+            { q: "2015 毫升 ( ) 2 公升 15 毫升", a: "=" },
+            { q: "2020 毫升 ( ) 2 公升 20 毫升", a: "=" },
+            { q: "1050 毫升 ( ) 1205 毫升", a: "<" },
+            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
+            { q: "2030 毫升 ( ) 2 公升 30 毫升", a: "=" },
+            { q: "2035 毫升 ( ) 2 公升 35 毫升", a: "=" },
+            { q: "2040 毫升 ( ) 2 公升 40 毫升", a: "=" },
+            { q: "1100 毫升 ( ) 1210 毫升", a: "<" },
+            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
+            { q: "2050 毫升 ( ) 2 公升 50 毫升", a: "=" },
+            { q: "2055 毫升 ( ) 2 公升 55 毫升", a: "=" },
+            { q: "2060 毫升 ( ) 2 公升 60 毫升", a: "=" },
+            { q: "1150 毫升 ( ) 1215 毫升", a: "<" },
+            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
+            { q: "2070 毫升 ( ) 2 公升 70 毫升", a: "=" },
+            { q: "2075 毫升 ( ) 2 公升 75 毫升", a: "=" },
+            { q: "2080 毫升 ( ) 2 公升 80 毫升", a: "=" },
+            { q: "1200 毫升 ( ) 1220 毫升", a: "<" },
+            { q: "1 公升 200 毫升 ( ) 1 公升 100 毫升", a: ">" },
+            { q: "2100 毫升 ( ) 2 公升 100 毫升", a: "=" },
+            { q: "2105 毫升 ( ) 2 公升 105 毫升", a: "=" },
+            { q: "2110 毫升 ( ) 2 公升 110 毫升", a: "=" }
+        ];
 
         let currentState = 'start'; 
         let currentIndex = 0; 
@@ -101,9 +140,9 @@
         let currentStepIndex = 0; 
         let score = 0;
         let userAnswers = [];
-        let feedbackState = null; // 用於存放當前回饋資訊
+        let feedbackState = null; 
 
-        // 智慧自動計算答案邏輯
+        // 自動計算邏輯
         function autoCalculateAnswer(text, type) {
             try {
                 const cleanText = text.replace(/\s+/g, '');
@@ -148,19 +187,31 @@
             return "";
         }
 
+        // 局部更新編輯器內的答案數值，防止頁面跳動
         function triggerUpdateAnswer(type, index) {
             const pool = type === 'conversion' ? conversionPool : comparisonPool;
             const questionText = pool[index].q;
             const newAns = autoCalculateAnswer(questionText, type);
             if (newAns !== "") {
                 pool[index].a = newAns;
-                render(); 
+                const inputId = `ans-input-${type}-${index}`;
+                const inputEl = document.getElementById(inputId);
+                if (inputEl) {
+                    inputEl.value = newAns;
+                    inputEl.classList.add('bg-green-200');
+                    setTimeout(() => inputEl.classList.remove('bg-green-200'), 500);
+                }
             }
         }
 
         function handleQuestionTextChange(type, index, value) {
             const pool = type === 'conversion' ? conversionPool : comparisonPool;
             pool[index].q = value;
+        }
+
+        function updatePool(type, index, field, value) {
+            const pool = type === 'conversion' ? conversionPool : comparisonPool;
+            pool[index][field] = value;
         }
 
         function render() {
@@ -176,12 +227,12 @@
                             </svg>
                         </div>
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">容量換算與比較</h1>
-                        <p class="text-gray-500 mb-8 px-4 text-sm">進度：第 ${currentIndex + 1} ~ ${currentIndex + 5} 題組</p>
+                        <p class="text-gray-500 mb-8 px-4 text-sm">目前選定：第 ${currentIndex + 1} ~ ${currentIndex + 5} 題組 (總計 25 題循環)</p>
                         
                         <div class="space-y-4 w-full max-w-sm">
                             <button onclick="startGame()" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl text-xl font-bold btn-hover shadow-lg">開始遊戲</button>
                             <button onclick="goSettings()" class="w-full border-2 border-green-100 text-green-600 py-3 rounded-2xl font-medium btn-hover flex items-center justify-center hover:bg-green-50">
-                                進入題庫編輯器
+                                進入題庫編輯器 (修改我的題目)
                             </button>
                         </div>
                     </div>
@@ -192,7 +243,7 @@
                     <div class="mb-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-green-200 transition-colors">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">題目 #${i+1}</span>
-                            ${(i >= currentIndex && i < currentIndex + 5) ? '<span class="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">目前考題</span>' : ''}
+                            ${(i >= currentIndex && i < currentIndex + 5) ? '<span class="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">目前考題範圍</span>' : ''}
                         </div>
                         <div class="flex gap-2 mb-2">
                             <input type="text" value="${q.q}" oninput="handleQuestionTextChange('${type}', ${i}, this.value)" class="flex-grow p-2 text-sm bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-green-400 outline-none font-medium" placeholder="輸入題目內容">
@@ -200,7 +251,7 @@
                         </div>
                         <div class="flex items-center">
                             <span class="text-[10px] text-green-500 font-bold mr-2">正解:</span>
-                            <input type="text" value="${q.a}" onchange="updatePool('${type}', ${i}, 'a', this.value)" class="flex-grow p-2 text-sm bg-green-50 border-none rounded-lg text-green-700 font-bold focus:ring-2 focus:ring-green-400 outline-none">
+                            <input type="text" id="ans-input-${type}-${i}" value="${q.a}" onchange="updatePool('${type}', ${i}, 'a', this.value)" class="flex-grow p-2 text-sm bg-green-50 border-none rounded-lg text-green-700 font-bold focus:ring-2 focus:ring-green-400 outline-none transition-all duration-300">
                         </div>
                     </div>
                 `).join('');
@@ -210,7 +261,7 @@
                         <div class="flex justify-between items-center mb-6 flex-shrink-0">
                             <div>
                                 <h2 class="text-2xl font-bold text-gray-800">題庫編輯器</h2>
-                                <p class="text-xs text-gray-400 mt-1">改好題目後，點擊「計算答案」同步更新正解</p>
+                                <p class="text-xs text-gray-400 mt-1">在這裡修改成你想要的題目，程式會記住你的修改。離開編輯器時會自動儲存。</p>
                             </div>
                             <button onclick="goHome()" class="bg-gray-800 text-white px-8 py-3 rounded-xl font-bold btn-hover">儲存並返回</button>
                         </div>
@@ -231,7 +282,6 @@
                 const q = currentGameQuestions[currentStepIndex];
                 const isComparison = currentStepIndex >= 5;
                 
-                // 如果正在顯示回饋，則渲染回饋畫面
                 if (feedbackState) {
                     container.innerHTML = `
                         <div class="flex flex-col flex-grow justify-center items-center feedback-pop">
@@ -245,9 +295,9 @@
                             <h2 class="text-4xl font-black mb-2 ${feedbackState.isCorrect ? 'text-green-600' : 'text-red-600'}">
                                 ${feedbackState.isCorrect ? '太棒了！答對囉' : '不小心答錯囉'}
                             </h2>
-                            ${!feedbackState.isCorrect ? `<p class="text-xl text-gray-500 mb-8 font-bold">正確答案是：<span class="text-red-600">${feedbackState.correctAnswer}</span></p>` : '<div class="mb-8"></div>'}
+                            ${!feedbackState.isCorrect ? `<p class="text-xl text-gray-500 mb-8 font-bold text-center">正確答案是：<br><span class="text-3xl text-red-600">${feedbackState.correctAnswer}</span></p>` : '<div class="mb-8"></div>'}
                             
-                            <button onclick="nextStep()" class="w-full max-w-sm bg-gray-800 text-white py-5 rounded-3xl text-xl font-bold btn-hover shadow-xl">繼續下一題</button>
+                            <button onclick="nextStep()" class="w-full max-sm bg-gray-800 text-white py-5 rounded-3xl text-xl font-bold btn-hover shadow-xl">繼續下一題</button>
                         </div>
                     `;
                     return;
@@ -264,8 +314,12 @@
                         <div class="text-center py-16 px-8 bg-gray-50 rounded-[2.5rem] mb-10 border-b-8 border-gray-100 shadow-inner">
                             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 leading-relaxed">${q.q}</h2>
                         </div>
-                        <div class="mb-10">
-                            <input type="text" id="answerInput" class="w-full p-6 bg-white border-4 border-gray-100 rounded-3xl text-3xl text-center focus:border-green-400 text-gray-800 outline-none transition-all shadow-sm" placeholder="在此輸入答案" autocomplete="off" style="color: #1f2937 !important;">
+                        <div class="mb-10 relative">
+                            <input type="text" id="answerInput" 
+                                class="w-full p-6 bg-white border-4 border-gray-100 rounded-3xl text-4xl text-center focus:border-green-400 outline-none transition-all shadow-sm" 
+                                placeholder="在此輸入答案" 
+                                autocomplete="off"
+                                style="color: #1f2937 !important; -webkit-text-fill-color: #1f2937 !important;">
                         </div>
                         <button onclick="submitAnswer()" class="w-full bg-green-600 text-white py-5 rounded-3xl text-xl font-bold btn-hover shadow-lg">確定送出</button>
                     </div>
@@ -275,11 +329,11 @@
                     const input = document.getElementById('answerInput');
                     if(input) {
                         input.focus();
-                        input.onkeydown = (e) => {
+                        input.addEventListener('keydown', (e) => {
                             if (e.key === 'Enter') submitAnswer();
-                        };
+                        });
                     }
-                }, 150);
+                }, 100);
             } else if (currentState === 'result') {
                 container.style.maxWidth = "42rem";
                 container.innerHTML = `
@@ -303,12 +357,9 @@
 
         function goHome() { currentState = 'start'; feedbackState = null; render(); }
         function goSettings() { currentState = 'settings'; feedbackState = null; render(); }
-        function updatePool(type, index, field, value) {
-            const pool = type === 'conversion' ? conversionPool : comparisonPool;
-            pool[index][field] = value;
-        }
 
         function startGame() {
+            // 從池子中抓取當前組別的 5+5 題
             currentGameQuestions = [
                 ...conversionPool.slice(currentIndex, currentIndex + 5),
                 ...comparisonPool.slice(currentIndex, currentIndex + 5)
@@ -329,7 +380,6 @@
             
             userAnswers.push({ userVal, isCorrect });
 
-            // 進入回饋狀態
             feedbackState = {
                 isCorrect: isCorrect,
                 correctAnswer: correctVal
@@ -343,6 +393,7 @@
                 currentStepIndex++;
                 render();
             } else {
+                // 自動跳到下 5 題組循環
                 currentIndex = (currentIndex + 5) % 25;
                 currentState = 'result';
                 render();
